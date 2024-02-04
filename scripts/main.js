@@ -1,51 +1,164 @@
 import Wav from './riff-wave-pcm.js'
+
+
 const React = window.React
 const ReactDOM = window.ReactDOM
 const e = React.createElement
+
+const radioOptions = [
+    { label: 'sine', value: 'sine' },
+    { label: 'square', value: 'square' },
+]
+
+const notes = [
+    {
+        frequency: 262,
+        note: 'C/Do'
+    },
+    {
+        frequency: 294,
+        note: 'D/Re'
+    },
+    {
+        frequency: 330,
+        note: 'E/Mi'
+    },
+    {
+        frequency: 349,
+        note: 'F/Fa'
+    },
+    {
+        frequency: 392,
+        note: 'G/So'
+    },
+    {
+        frequency: 440,
+        note: 'A/La'
+    },
+    {
+        frequency: 494,
+        note: 'B/Si'
+    },
+    {
+        frequency: 523,
+        note: 'C/Do'
+    },
+    {
+        frequency: 587,
+        note: 'D/Re'
+    },
+    {
+        frequency: 659,
+        note: 'E/Mi'
+    },
+    {
+        frequency: 698,
+        note: 'F/Fa'
+    },
+    {
+        frequency: 784,
+        note: 'G/So'
+    },
+    {
+        frequency: 880,
+        note: 'A/La'
+    },
+    {
+        frequency: 988,
+        note: 'B/Si'
+    }
+]
 
 class WavController extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
             melody: [],
-            volume: 50,
+            notes: [],
+            volume: 5,
+            waveType: 'sine',
         }
+
+        this.wav = new Wav(
+            {
+                duration: this.state.melody.length,
+                numberOfChannel: 1,
+                samplesPerSecond: 44100,
+                bytesPerSample: 1,
+            },
+            this.state.melody,
+            this.state.waveType,
+            this.state.volume
+        )
+    }
+
+    handleOptionChange = (e) => {
+        console.log(e.target.value)
+        this.setState({ waveType: e.target.value })
     }
 
     render() {
-        let option = {
-            duration: this.state.melody.length,
-            numberOfChannel: 1,
-            samplesPerSecond: 44100,
-            bytesPerSample: 1,
-        }
-        let wav = new Wav(option, this.state.melody, this.state.volume)
+        this.wav.update(
+            {
+                duration: this.state.melody.length,
+                numberOfChannel: 1,
+                samplesPerSecond: 44100,
+                bytesPerSample: 1,
+            },
+            this.state.melody,
+            this.state.waveType,
+            this.state.volume
+        )
+
         return (
             e('div', {},
+                // 音符选择
                 e('div', {
-                    onClick: e => {
-                        let value = e.target.value
-                        if (!value) {
-                            return
+                        onClick: e => {
+                            // console.log(e)
+                            // console.log(e.target)
+                            // console.log(e.target.value)
+                            // console.log(e.target.name)
+                            let name = e.target.name
+                            let value = e.target.value
+                            if (!value) {
+                                return
+                            }
+                            this.setState(prevState => {
+                                // console.log(prevState.melody)
+                                return {
+                                    melody: [...prevState.melody, value],
+                                    notes: [...prevState.notes, name],
+                                }
+                            })
                         }
-                        this.setState(prevState => {
-                            console.log(prevState.melody)
-                            return {melody: [...prevState.melody, value]}
-                        })
-                    }
-                },
-                e('button', {value: 523}, '1'),
-                e('button', {value: 587}, '2'),
-                e('button', {value: 659}, '3'),
-                e('button', {value: 698}, '4'),
-                e('button', {value: 784}, '5'),
-                e('button', {value: 880}, '6'),
-                e('button', {value: 988}, '7'),
-                e('p', {}, this.state.melody.join(","))
+                    },
+
+                    notes.map(
+                        (note) => e('button', {value: note.frequency, name: note.note}, note.note)
+                    ),
+
+                    e('p', {}, this.state.notes.join(",")),
                 ),
+
+                // 波形选择
+                e('div', {},
+                    radioOptions.map((option) => e(
+                        'label', {key : option.label},
+                        e('input', {
+                            type: 'radio',
+                            name: 'option',
+                            value: option.value,
+                            checked: this.state.waveType === option.value,
+                            onChange: this.handleOptionChange.bind(this),
+                        }), option.label
+                    )),
+                ),
+
+                // 播放控件
                 e('Audio', {
                     preload: 'auto',
-                    src: "data:Audio/WAV;base64," + wav.audioData,
+                    src: "data:Audio/WAV;base64," + this.wav.audioData,
                     controls: "controls",
                 })
             )
