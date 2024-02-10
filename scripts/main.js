@@ -1,4 +1,5 @@
-import Wav from './riff-wave-pcm.js'
+import Wav from './SFX.js'
+import {notes} from './data.js'
 
 
 const React = window.React
@@ -8,65 +9,6 @@ const e = React.createElement
 const radioOptions = [
     { label: 'sine', value: 'sine' },
     { label: 'square', value: 'square' },
-]
-
-const notes = [
-    {
-        frequency: 262,
-        note: 'C/Do'
-    },
-    {
-        frequency: 294,
-        note: 'D/Re'
-    },
-    {
-        frequency: 330,
-        note: 'E/Mi'
-    },
-    {
-        frequency: 349,
-        note: 'F/Fa'
-    },
-    {
-        frequency: 392,
-        note: 'G/So'
-    },
-    {
-        frequency: 440,
-        note: 'A/La'
-    },
-    {
-        frequency: 494,
-        note: 'B/Si'
-    },
-    {
-        frequency: 523,
-        note: 'C/Do'
-    },
-    {
-        frequency: 587,
-        note: 'D/Re'
-    },
-    {
-        frequency: 659,
-        note: 'E/Mi'
-    },
-    {
-        frequency: 698,
-        note: 'F/Fa'
-    },
-    {
-        frequency: 784,
-        note: 'G/So'
-    },
-    {
-        frequency: 880,
-        note: 'A/La'
-    },
-    {
-        frequency: 988,
-        note: 'B/Si'
-    }
 ]
 
 class WavController extends React.Component {
@@ -124,6 +66,7 @@ class WavController extends React.Component {
                             if (!value) {
                                 return
                             }
+                            this.wav.play(value)
                             this.setState(prevState => {
                                 // console.log(prevState.melody)
                                 return {
@@ -134,8 +77,23 @@ class WavController extends React.Component {
                         }
                     },
 
-                    notes.map(
-                        (note) => e('button', {value: note.frequency, name: note.note}, note.note)
+                    e('div', {},
+                        e('p', {}, '3'),
+                        notes[3].map(
+                            (note) => e('button', {value: note.frequency, name: note.note}, note.note)
+                        ),
+                    ),
+                    e('div', {},
+                        e('p', {}, '4'),
+                        notes[4].map(
+                            (note) => e('button', {value: note.frequency, name: note.note}, note.note)
+                        ),
+                    ),
+                    e('div', {},
+                        e('p', {}, '5'),
+                        notes[5].map(
+                            (note) => e('button', {value: note.frequency, name: note.note}, note.note)
+                        ),
                     ),
 
                     e('p', {}, this.state.notes.join(",")),
